@@ -1,7 +1,7 @@
 {
-  "name": "voting",
+  "name": "Co-Insurance-Chain",
   "version": "0.1.0",
-  "homepage": "/voting",
+  "homepage": "https://KumainLondon.github.io/Co-Insurance-Chain",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.6",

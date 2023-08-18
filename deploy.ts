@@ -21,9 +21,9 @@ async function main() {
     await Buying.compile()
 
     const insuranceNames: FixedArray<Name, typeof N> = [
-        toByteString('iPhone', true),
-        toByteString('Android', true),
-        toByteString('Android', true)
+        toByteString('25-35', true),
+        toByteString('35-45', true),
+        toByteString('45-55', true)
     ]
 
     const instance = new Buying(
