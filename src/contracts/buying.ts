@@ -2,42 +2,42 @@ import { assert, ByteString, hash256, method, prop, SmartContract, FixedArray, f
 
 export type Name = ByteString
 
-export type Candidate = {
+export type Insurance = {
     name: Name
-    votesReceived: bigint
+    Received: bigint
 }
 
-export const N = 2
+export const N = 3
 
-export type Candidates = FixedArray<Candidate, typeof N>
+export type Insurances = FixedArray<Insurance, typeof N>
 
-export class Voting extends SmartContract {
+export class Buying extends SmartContract {
     @prop(true)
-    candidates: Candidates
+    insurances: Insurances
 
     constructor(names: FixedArray<Name, typeof N>) {
         super(...arguments)
         // initialize fixed array
-        this.candidates = fill({
+        this.insurances = fill({
             name: toByteString(''),
-            votesReceived: 0n,
+            Received: 0n,
         }, N)
-        // set names and set votes they received to 0
+        // set names and set orders to 0
         for (let i = 0; i < N; i++) {
-            this.candidates[i] = {
+            this.insurances[i] = {
                 name: names[i],
-                votesReceived: 0n,
+                Received: 0n,
             }
         }
     }
 
     /**
-     * vote for a candidate
-     * @param name candidate's name
+     * order an insurance
+     * @param name a insurance
      */
     @method()
-    public vote(name: Name) {
-        this.increaseVotesReceived(name)
+    public buy(name: Name) {
+        this.increase(name)
         // output containing the latest state and the same balance
         let outputs: ByteString = this.buildStateOutput(this.ctx.utxo.value)
         if (this.changeAmount > 0n) {
@@ -47,10 +47,10 @@ export class Voting extends SmartContract {
     }
 
     @method()
-    increaseVotesReceived(name: Name): void {
+    increase(name: Name): void {
         for (let i = 0; i < N; i++) {
-            if (this.candidates[i].name === name) {
-                this.candidates[i].votesReceived++
+            if (this.insurances[i].name === name) {
+                this.insurances[i].Received++
             }
         }
     }

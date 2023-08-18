@@ -1,4 +1,4 @@
-import { Name, Voting, N } from './src/contracts/voting'
+import { Name, Buying, N } from './src/contracts/buying'
 import { bsv, TestWallet, DefaultProvider, toByteString, FixedArray } from 'scrypt-ts'
 
 import * as dotenv from 'dotenv'
@@ -18,24 +18,25 @@ const signer = new TestWallet(privateKey, new DefaultProvider({
 }))
 
 async function main() {
-    await Voting.compile()
+    await Buying.compile()
 
-    const candidateNames: FixedArray<Name, typeof N> = [
+    const insuranceNames: FixedArray<Name, typeof N> = [
         toByteString('iPhone', true),
+        toByteString('Android', true),
         toByteString('Android', true)
     ]
 
-    const instance = new Voting(
-        candidateNames
+    const instance = new Buying(
+        insuranceNames
     )
 
     // Connect to a signer.
     await instance.connect(signer)
 
     // Contract deployment.
-    const amount = 1
+    const amount = 100
     const deployTx = await instance.deploy(amount)
-    console.log('Voting contract deployed: ', deployTx.id)
+    console.log('Buying contract deployed: ', deployTx.id)
 }
 
 main()

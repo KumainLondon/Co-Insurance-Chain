@@ -23,13 +23,13 @@ import {
   ContractCalledEvent,
   ByteString,
 } from "scrypt-ts";
-import { Voting } from "./contracts/voting";
+import { Buying } from "./contracts/buying";
 import Footer from "./Footer";
 
 // `npm run deploycontract` to get deployment transaction id
 const contract_id = {
   /** The deployment transaction id */
-  txId: "107ef6132f3c06305baa0202d1d73c670368ff209338e820f60864f3cc8344e8",
+  txId: "5b684ab658ad9e6d40ef5376c6005fb5910190cc75d5a6dda8aa27a70a853871",
   /** The output index */
   outputIndex: 0,
 };
@@ -39,21 +39,21 @@ function byteString2utf8(b: ByteString) {
 }
 
 function App() {
-  const [votingContract, setContract] = useState<Voting>();
+  const [buyingContract, setContract] = useState<Buying>();
   const signerRef = useRef<SensiletSigner>();
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState<{
     txId: string;
-    candidate: string;
+    insurance: string;
   }>({
     txId: "",
-    candidate: "",
+    insurance: "",
   });
 
   async function fetchContract() {
     try {
       const instance = await Scrypt.contractApi.getLatestInstance(
-        Voting,
+        Buying,
         contract_id
       );
       setContract(instance);
@@ -73,13 +73,13 @@ function App() {
 
     const subscription = Scrypt.contractApi.subscribe(
       {
-        clazz: Voting,
+        clazz: Buying,
         id: contract_id,
       },
-      (event: ContractCalledEvent<Voting>) => {
+      (event: ContractCalledEvent<Buying>) => {
         setSuccess({
           txId: event.tx.id,
-          candidate: event.args[0] as ByteString,
+          insurance: event.args[0] as ByteString,
         });
         setContract(event.nexts[0]);
       }
@@ -109,40 +109,40 @@ function App() {
     }
     setSuccess({
       txId: "",
-      candidate: "",
+      insurance: "",
     });
   };
 
-  async function voting(e: any) {
+  async function buying(e: any) {
     handleSuccessClose(e);
     const signer = signerRef.current as SensiletSigner;
 
-    if (votingContract && signer) {
+    if (buyingContract && signer) {
       const { isAuthenticated, error } = await signer.requestAuth();
       if (!isAuthenticated) {
         throw new Error(error);
       }
 
-      await votingContract.connect(signer);
+      await buyingContract.connect(signer);
 
       // create the next instance from the current
-      const nextInstance = votingContract.next();
+      const nextInstance = buyingContract.next();
 
-      const candidateName = e.target.name;
+      const insuranceName = e.target.name;
 
       // update state
-      nextInstance.increaseVotesReceived(candidateName);
+      nextInstance.increase(insuranceName);
 
       // call the method of current instance to apply the updates on chain
-      votingContract.methods
-        .vote(candidateName, {
+      buyingContract.methods
+        .buy(insuranceName, {
           next: {
             instance: nextInstance,
-            balance: votingContract.balance,
+            balance: buyingContract.balance,
           },
         })
         .then((result) => {
-          console.log(`Voting call tx: ${result.tx.id}`);
+          console.log(`Buying call tx: ${result.tx.id}`);
         })
         .catch((e) => {
           setError(e.message);
@@ -155,80 +155,113 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h2>What's your favorite phone?</h2>
+        <h2>Choose your insurance depends on your age.</h2>
       </header>
       <TableContainer
         component={Paper}
         variant="outlined"
-        style={{ width: 1200, height: "80vh", margin: "auto" }}
+        style={{ width: 600, height: "100vh", margin: "auto" }}
       >
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">iPhone</TableCell>
-              <TableCell align="center">Android</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell align="center">
-                <Box>
-                  <Box
-                    sx={{
-                      height: 200,
-                    }}
-                    component="img"
-                    alt={"iphone"}
-                    src={`${process.env.PUBLIC_URL}/${"iphone"}.png`}
-                  />
-                </Box>
-              </TableCell>
-              <TableCell align="center">
-                <Box>
-                  <Box
-                    sx={{
-                      height: 200,
-                    }}
-                    component="img"
-                    alt={"android"}
-                    src={`${process.env.PUBLIC_URL}/${"android"}.png`}
-                  />
-                </Box>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="center">
+          <TableRow>
+            
+            <TableCell align="center">
+              <Box>
+                <Box
+                  sx={{
+                    height: 200,
+                  }}
+                  component="img"
+                  alt={"25-35"}
+                  src={`${process.env.PUBLIC_URL}/${"25-35"}.jpg`}
+                />
+              </Box>
+            </TableCell>
+            <TableCell align="center">25-35</TableCell>
+            <TableCell align="center">
                 <Box>
                   <Typography variant={"h1"} >
-                    {votingContract?.candidates[0].votesReceived.toString()}
-                  </Typography>
-                  <Button
-                    variant="text"
-                    onClick={voting}
-                    name={votingContract?.candidates[0].name}
-                  >
-                    👍
-                  </Button>
+                    {buyingContract?.insurances[0].Received.toString()}
+                  </Typography><h3>Sold</h3>
                 </Box>
-              </TableCell>
-
-              <TableCell align="center">
+            </TableCell> 
+            <TableCell>
+            <Button
+                  variant="text"
+                  onClick={buying}
+                  name={buyingContract?.insurances[0].name}
+                >
+                buy
+            </Button>
+            </TableCell>
+          </TableRow>
+            
+          <TableRow>
+            
+            <TableCell align="center">
+              <Box>
+                <Box
+                  sx={{
+                    height: 200,
+                  }}
+                  component="img"
+                  alt={"35-45"}
+                  src={`${process.env.PUBLIC_URL}/${"35-45"}.png`}
+                />
+              </Box>
+            </TableCell>
+            <TableCell align="center">35-45</TableCell>
+            <TableCell align="center">
               <Divider orientation="vertical" flexItem />
                 <Box>
                   <Typography variant={"h1"}>
-                    {votingContract?.candidates[1].votesReceived.toString()}
-                  </Typography>
-                  <Button
-                    variant="text"
-                    onClick={voting}
-                    name={votingContract?.candidates[1].name}
-                  >
-                    👍
-                  </Button>
+                    {buyingContract?.insurances[1].Received.toString()}
+                  </Typography><h3>Sold</h3>
                 </Box>
-              </TableCell>
+            </TableCell>
+            <TableCell align="center"> 
+              <Button
+                variant="text"
+                onClick={buying}
+                name={buyingContract?.insurances[1].name}
+                >
+                buy
+                </Button>
+            </TableCell>
             </TableRow>
-          </TableBody>
+
+            <TableRow>
+            <TableCell align="center">
+              <Box>
+                <Box
+                  sx={{
+                    height: 200,
+                  }}
+                  component="img"
+                  alt={"45-55"}
+                  src={`${process.env.PUBLIC_URL}/${"45-55"}.png`}
+                />
+              </Box>
+            </TableCell>
+            <TableCell align="center">45-55</TableCell>
+            <TableCell align="center">
+                <Box>
+                  <Typography variant={"h1"} >
+                    {buyingContract?.insurances[2].Received.toString()}
+                  </Typography><h3>Sold</h3>
+                  
+                </Box>
+              </TableCell> 
+            <TableCell>
+              <Button
+                  variant="text"
+                  onClick={buying}
+                  name={buyingContract?.insurances[2].name}
+                  >
+                 buy
+              </Button>
+            </TableCell>
+          </TableRow>
         </Table>
       </TableContainer>
       <Footer />
@@ -241,7 +274,7 @@ function App() {
       </Snackbar>
 
       <Snackbar
-        open={success.candidate !== "" && success.txId !== ""}
+        open={success.insurance !== "" && success.txId !== ""}
         autoHideDuration={6000}
         onClose={handleSuccessClose}
       >
@@ -252,7 +285,7 @@ function App() {
             target="_blank"
             rel="noreferrer"
           >
-            {`"${byteString2utf8(success.candidate)}" got one vote,  tx: ${
+            {`"${byteString2utf8(success.insurance)}" got one order,  tx: ${
               success.txId
             }`}
           </Link>

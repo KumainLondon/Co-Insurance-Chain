@@ -5,9 +5,9 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Scrypt, bsv } from 'scrypt-ts'
 
-import { Voting } from './contracts/voting';
-import artifact  from '../artifacts/voting.json';
-Voting.loadArtifact(artifact);
+import {Buying } from './contracts/buying';
+import artifact  from '../artifacts/buying.json';
+Buying.loadArtifact(artifact);
 
 
 Scrypt.init({
