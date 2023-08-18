@@ -1,4 +1,5 @@
-This is a 
+This is a Co-Insurance-Chain.
+
 There are two contracts right now. 
 
 The buying contract is a demo for people to buy insurance.
